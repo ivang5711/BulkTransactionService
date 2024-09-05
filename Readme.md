@@ -5,7 +5,56 @@
 A simple web service to perform bulk salary payment transaction.\
 This is a practice app to demonstrate one of the possible approaches.
 
+## Table of contents
+
+1. [Description](#description)
+2. [How to run the app](#how-to-run-the-app)\
+2.1 [run in Docker containers](#run-in-docker-containers)\
+2.2 [run directly without using Docker containers](#run-directly-without-using-docker-containers)
+3. [Dependencies](#dependencies)
+
+## Description
+
+The app allows a user to perform a bulk payment transaction.
+The app consists of WebApi with a single endpoint and a database.
+
+The data flow:
+1. The Salaries endpoint accepts POST requests. 
+2. Then the body of a request goes through validation and mapping from\
+request object to domain object.
+3. Then the payment is done by invoking "PaySalaryAsync" method of the\
+Payment Service.
+4. The Payment service invokes "PerformPaymentAsync" method of the PaymentRepository class.
+5. The "PerformPaymentAsync" method performs operations on database.\
+5.1 First it retrieves from the database the account id of a user\
+which performed the request.\
+5.2 Then it updates the domain object with the corresponding account id.\
+5.3 Then it calculates the total amount requested.\
+5.4 Then it begins a SQL transaction and invokes a stored procedure to check\
+if the bank account have enough funds to perform all the payments.\
+5.5 In case the 5.4 stage was a success the account balance decreases by total\
+amount of all requested transactions, and each of the requested transactions\
+gets added to the transactions table in the database.
+
+In case of success the methods return true to the calling counterparts and the controller returns 201 code to the caller eventually.
+
+In case of failure of the transaction in the repository class the transaction\
+rolls back, no changes apply to the database tables. The repository and\
+service methods returen false and the controller returns 422 code to the caller.
+
+Additional notes:
+
+The app uses build in DI container to register and inject dependencies.\
+Also it uses Mapster mapping library to simplify code and map request to domain\
+object in a cleaner way.
+To handle Database initialization and migrations\
+the app uses DbUp-PostgreSQL library.\
+To perform database related operations the app uses Dapper.\
+To perform validation the app uses FluentValidation.
+
 ## How to run the app
+
+### run in  Docker containers
 
 The app and the corresponding database are conteinerized with docker.\
 You need docker installed in order use it. See <a href="https://docs.docker.com/get-started/get-docker/">Docker website</a> for more details.
@@ -44,6 +93,8 @@ docker volume rm bulktransactionservice_postgres_data
 >**Note:** The database container have to be stopped before dropping the attached volume
 
 ---
+
+### run directly without using Docker containers
 
 Alternatively, you can run the app and database without using docker contaier.\
 First, you need to set up your own instance of a database.\
