@@ -7,11 +7,14 @@ This is a practice app to demonstrate one of the possible approaches.
 
 ## Table of contents
 
-1. [Description](#description)
-2. [How to run the app](#how-to-run-the-app)\
-2.1 [run in Docker containers](#run-in-docker-containers)\
-2.2 [run directly without using Docker containers](#run-directly-without-using-docker-containers)
-3. [Dependencies](#dependencies)
+- [Bulk Transaction Service](#bulk-transaction-service)
+  - [Table of contents](#table-of-contents)
+  - [Description](#description)
+  - [How to run the app](#how-to-run-the-app)
+    - [Run in Docker containers](#run-in-docker-containers)
+    - [Run directly without using Docker containers](#run-directly-without-using-docker-containers)
+  - [How to use](#how-to-use)
+  - [Dependencies](#dependencies)
 
 ## Description
 
@@ -54,7 +57,7 @@ To perform validation the app uses FluentValidation.
 
 ## How to run the app
 
-### run in  Docker containers
+### Run in Docker containers
 
 The app and the corresponding database are conteinerized with docker.\
 You need docker installed in order use it. See <a href="https://docs.docker.com/get-started/get-docker/">Docker website</a> for more details.
@@ -94,7 +97,7 @@ docker volume rm bulktransactionservice_postgres_data
 
 ---
 
-### run directly without using Docker containers
+### Run directly without using Docker containers
 
 Alternatively, you can run the app and database without using docker contaier.\
 First, you need to set up your own instance of a database.\
@@ -107,6 +110,20 @@ you can execute the following command from the solution folder to start the app:
 ```
 dotnet run --project src/BulkTransactionServiceWebApi/BulkTransactionServiceWebApi.csproj
 ```
+
+## How to use
+
+You can send post requests to the {YourbaseUrl}/Salary endpoint.\
+There are 2 sample requests stored alongside the source code for your disposal.\
+The samples contain requests from the same sender.
+
+[sample1.http](/requests/sample-request-1.http)\
+[sample2.http](/requests/sample-request-2.http)
+
+Corresponding account record already present in database. It initializes with all the necessuary values to test the functionality of the app with the sample requests.
+
+Because the purpose of the app is to demonstrate bulk request handling, there\
+are no other endpoints and no defined ways to setup new account but the direct database access.
 
 ## Dependencies
 
