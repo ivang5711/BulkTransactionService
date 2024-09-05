@@ -1,0 +1,36 @@
+version: "3.9"
+
+services:
+  webapp:
+    container_name: bulk-transfer-api
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "5067:5067"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - Database__ConnectionStrings__DefaultConnection=Host=db;Port=5432;Database=bulk-transfer;Username=postgres;Password=strong_password;
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    container_name: bulk-transfer-db
+    image: postgres:latest
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: bulk-transfer
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: strong_password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d bulk-transfer"]
+      interval: 5s
+      timeout: 5s
+      retries: 5      
+
+volumes:
+  postgres_data:
