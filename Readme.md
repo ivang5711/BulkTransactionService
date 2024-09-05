@@ -8,7 +8,7 @@ This is a practice app to demonstrate one of the possible approaches.
 ## How to run the app
 
 The app and the corresponding database are conteinerized with docker.\
-You need docker installed in order use it. See <a href="https://docs.docker.com/get-started/get-docker/">docker website</a> for more details.
+You need docker installed in order use it. See <a href="https://docs.docker.com/get-started/get-docker/">Docker website</a> for more details.
 
 Use docker compose to build and run the app:
 
@@ -64,7 +64,7 @@ You need to have .NET 8 Runtime installed in order to run the app.\
 Visit <a href="https://dotnet.microsoft.com/en-us/download/dotnet/8.0">Microsoft website</a> for more information.
 
 The app and the corresponding database are conteinerized with docker.\
-You need docker installed in order use it. See <a href="https://docs.docker.com/get-started/get-docker/">docker website</a> for more details.
+You need docker installed in order use it. See <a href="https://docs.docker.com/get-started/get-docker/">Docker website</a> for more details.
 
 This app uses Postgresql. If you don't want to use postgres in docker container\
 you have to set up your own instance of the database.You can find more\
