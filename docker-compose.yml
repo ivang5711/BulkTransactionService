@@ -1,3 +1,5 @@
+# FIXME: there's a warning when you run it
+# TODO: have a look at .env files if you want to prettify your docker env
 version: "3.9"
 
 services:
