@@ -8,27 +8,36 @@ This is a practice app to demonstrate one of the possible approaches.
 ## Table of contents
 
 - [Bulk Transaction Service](#bulk-transaction-service)
-  - [Table of contents](#table-of-contents)
-  - [Description](#description)
-  - [How to run the app](#how-to-run-the-app)
-    - [Run in Docker containers](#run-in-docker-containers)
-    - [Run directly without using Docker containers](#run-directly-without-using-docker-containers)
-  - [How to use](#how-to-use)
-  - [Dependencies](#dependencies)
+    - [Table of contents](#table-of-contents)
+    - [Description](#description)
+    - [How to run the app](#how-to-run-the-app)
+        - [Run in Docker containers](#run-in-docker-containers)
+        - [Run directly without using Docker containers](#run-directly-without-using-docker-containers)
+    - [How to use](#how-to-use)
+    - [Dependencies](#dependencies)
+    - [Wrong Calls](#wrong-calls)
+        - [IBAN not found](#iban-not-found)
+        - [IBAN not valid](#iban-not-valid)
+        - [Empty organization\_name](#empty-organization_name)
+        - [organization\_bic misusage](#organization_bic-misusage)
+        - ["abc" as amount](#abc-as-amount)
 
 ## Description
 
 The app allows a user to perform a bulk payment transaction.
 The app consists of WebApi with a single endpoint and a database.
 
+<!-- TODO: install a Markdown linter since there are some warnings in the MD file. -->
+<!-- TODO: The list is bad-indented. -->
+
 The data flow:
 1. The Salaries endpoint accepts POST requests. 
 2. Then the body of a request goes through validation and mapping from\
 request object to domain object.
-3. Then the payment is done by invoking "PaySalaryAsync" method of the\
+1. Then the payment is done by invoking "PaySalaryAsync" method of the\
 Payment Service.
-4. The Payment service invokes "PerformPaymentAsync" method of the PaymentRepository class.
-5. The "PerformPaymentAsync" method performs operations on database.\
+1. The Payment service invokes "PerformPaymentAsync" method of the PaymentRepository class.
+2. The "PerformPaymentAsync" method performs operations on database.\
 5.1 First it retrieves from the database the account id of a user\
 which performed the request.\
 5.2 Then it updates the domain object with the corresponding account id.\
@@ -47,7 +56,7 @@ service methods returen false and the controller returns 422 code to the caller.
 
 Additional notes:
 
-The app uses build in DI container to register and inject dependencies.\
+The app uses built-in DI container to register and inject dependencies.\
 Also it uses Mapster mapping library to simplify code and map request to domain\
 object in a cleaner way.
 To handle Database initialization and migrations\
@@ -94,8 +103,10 @@ You can drop the data in the volume by using the command:
 docker volume rm bulktransactionservice_postgres_data
 ```
 >**Note:** The database container have to be stopped before dropping the attached volume
-
----
+<!-- FIXME: wrong, they also need to be removed from stopped containers. -->
+<!-- You have some options: manual remove containers with "docker rm -f <first 3 digits of containers>, -->
+<!-- use "docker compose down --volumes" -->
+<!-- use "docker volume rm bulktransactionservice_postgres_data --force" to see which containers are using your volume -->
 
 ### Run directly without using Docker containers
 
@@ -137,3 +148,33 @@ You need docker installed in order use it. See <a href="https://docs.docker.com/
 This app uses Postgresql. If you don't want to use postgres in docker container\
 you have to set up your own instance of the database.You can find more\
 information on the <a href="https://www.postgresql.org/">Postgres website</a>.
+
+## Wrong Calls
+
+Below, you can find a list of calls that don't work as expected. You have two options:
+
+1. Repro them via a REST-api client (Postman, cURL, insomnia) and fix them in the source code
+2. You can write automated tests such as unit, integration or end2end tests
+
+My favorite way is the second one but you can evaluate to mix them.
+
+### IBAN not found
+
+If you change the IBAN code to something not existing in the DB, you'll be presented with a stack trace as the response. `500` status code should not be returned here.
+
+### IBAN not valid
+
+If you change the IBAN code to something not valid, you'll be presented with a stack trace as the response. `500` status code should not be returned here.
+
+### Empty organization_name
+
+It must not return a `422` error.
+
+### organization_bic misusage
+
+If I use a wrong `organization_bic` value, it doesn't matter since you lookup accounts only by `organization_iban`.
+
+### "abc" as amount
+
+Manage this scenario, you cannot return a stack trace. As a rule of thumb, **a stack trace never has to be returned.**
+
